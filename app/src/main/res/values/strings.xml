@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Curtain Control</string>
+    <string name="cancel">Cancel</string>
+    <string name="conform">Confirm</string>
+    <string name="set_auto_time">Set Off Time :</string>
+    <string name="off_time">Start Time:</string>
+    <string name="on_time">End Time :</string>
+    <string name="on">ON</string>
+    <string name="off">OFF</string>
+
+    <string name="todo">TODO</string>
+    <string name="getlight">getLight</string>
+    <string name="current_light">Current Light ：</string>
+    <string name="curtain_status_open_close">Curtain Status (OPEN/ CLOSE):</string>
+    <string name="smart_curtain">Smart Curtain</string>
+</resources>
