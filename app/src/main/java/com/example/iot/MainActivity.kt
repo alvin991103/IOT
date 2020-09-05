@@ -44,16 +44,15 @@ class MainActivity : AppCompatActivity() {
           btn2_timefrom()
       }
       btn_set.setOnClickListener{
-          checkTime()
+          checkTime.run()
       }
+        checkTime
+
       btn_reset.setOnClickListener(){
           buttonEnd.setText("00:00")
           buttonStart.setText("00:00")
       }
-
-
         //checkLight.run()
-
       manual_switch.setOnClickListener {
           if(manual_switch.isChecked == true){
               myref.child("relay").setValue("1")//open
@@ -64,7 +63,6 @@ class MainActivity : AppCompatActivity() {
           }
       }
     }
-
 
     fun initValue(){
         val usersettings = getSharedPreferences("Preferences", Context.MODE_PRIVATE)
@@ -81,7 +79,6 @@ class MainActivity : AppCompatActivity() {
             statusOfCurtain.isChecked = true//open
         }
     }
-
 
     private val getLight: Runnable = object: Runnable{
         override fun run() {
@@ -129,34 +126,38 @@ class MainActivity : AppCompatActivity() {
         dialog.show(supportFragmentManager, "TimePicker")
     }
 
-    private fun checkTime(){
-        val sdf = SimpleDateFormat("yyyyMMdd")
-        val frmt = DecimalFormat("00")
-        val date = sdf.format(Date())
-        val ddbdate = "PI_03_" + date
-        val hour = SimpleDateFormat("HH").format(Date())
-        val min = SimpleDateFormat("mm").format(Date())
-        val sec = SimpleDateFormat("ss").format(Date())
-        val minSec = min + frmt.format((floor(sec.toDouble()/10)*10).toInt())
+    //private fun checkTime()
+    private val checkTime: Runnable = object: Runnable{
+        override fun run(){
+            val sdf = SimpleDateFormat("yyyyMMdd")
+            val frmt = DecimalFormat("00")
+            val date = sdf.format(Date())
+            val ddbdate = "PI_03_" + date
+            val hour = SimpleDateFormat("HH").format(Date())
+            val min = SimpleDateFormat("mm").format(Date())
+            val sec = SimpleDateFormat("ss").format(Date())
+            val minSec = min + frmt.format((floor(sec.toDouble()/10)*10).toInt())
 
-        val time = SimpleDateFormat("HH:mm").format(Date())
-        val ref = FirebaseDatabase.getInstance().getReference().child(ddbdate)
-        val lastQuery = ref.child(hour).child(minSec)
-        lastQuery.addValueEventListener(object : ValueEventListener{
-            override fun onDataChange(p0: DataSnapshot) {
-                val startTime = buttonStart.text.toString()
-                val endTime = buttonEnd.text.toString()
+            val time = SimpleDateFormat("HH:mm").format(Date())
+            val ref = FirebaseDatabase.getInstance().getReference().child(ddbdate)
+            val lastQuery = ref.child(hour).child(minSec)
+            lastQuery.addValueEventListener(object : ValueEventListener{
+                override fun onDataChange(p0: DataSnapshot) {
+                    val startTime = buttonStart.text.toString()
+                    val endTime = buttonEnd.text.toString()
 
-                if(time >= startTime && time <=endTime){
-                    myref.child("relay").setValue("0")//close
-                }else{
-                    myref.child("relay").setValue("1")//open
+                    if(time >= startTime && time < endTime){
+                        myref.child("relay").setValue("0")//close
+                    }else{
+                        myref.child("relay").setValue("1")//open
+                    }
                 }
-            }
-            override fun onCancelled(p0: DatabaseError) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-        })
+                override fun onCancelled(p0: DatabaseError) {
+                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                }
+            })
+            handlers.postDelayed(this, 1000)
+        }
     }
 
    /* private val checkLight:Runnable = object: Runnable{
@@ -197,7 +198,6 @@ class MainActivity : AppCompatActivity() {
         }
     } */
 
-
     private val ToastRunnabler: Runnable = object : Runnable {
         override fun run() {
             val userSettings = getSharedPreferences("Preferences", Context.MODE_PRIVATE)
@@ -216,7 +216,5 @@ class MainActivity : AppCompatActivity() {
             handlers.postDelayed(this, 100)
         }
     }
-
-
 }
 

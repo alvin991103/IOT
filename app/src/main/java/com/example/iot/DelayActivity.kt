@@ -25,7 +25,7 @@ class DelayActivity : AppCompatActivity() {
                 val i = Intent(this, MainActivity::class.java)
                 startActivity(i)
                 finish()
-            }, 100)
+            }, 1000)
     }
 
     fun initValue(){
@@ -43,7 +43,6 @@ class DelayActivity : AppCompatActivity() {
                 prefEditor.putString("relay",relay.toString())
                 prefEditor.apply()
                 Log.d("CH",relay.toString())
-
             }
         })
     }
