@@ -13,4 +13,6 @@
     <string name="current_light">Current Light ：</string>
     <string name="curtain_status_open_close">Curtain Status (OPEN/ CLOSE):</string>
     <string name="smart_curtain">Smart Curtain</string>
+    <string name="start">start</string>
+    <string name="end">end</string>
 </resources>

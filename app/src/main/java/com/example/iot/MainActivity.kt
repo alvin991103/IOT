@@ -28,7 +28,7 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
     private val handlers: Handler = Handler()
     val myref = FirebaseDatabase.getInstance().getReference("PI_03_CONTROL")
-  //  var mode : Int = 1
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +37,32 @@ class MainActivity : AppCompatActivity() {
         initValue()
         getLight.run()
         ToastRunnabler.run()
-        checkLight.run()
+      buttonStart.setOnClickListener{
+          btn1_timefrom()
+      }
+      buttonEnd.setOnClickListener{
+          btn2_timefrom()
+      }
+      btn_set.setOnClickListener{
+          checkTime()
+      }
+      btn_reset.setOnClickListener(){
+          buttonEnd.setText("00:00")
+          buttonStart.setText("00:00")
+      }
+
+
+        //checkLight.run()
+
+      manual_switch.setOnClickListener {
+          if(manual_switch.isChecked == true){
+              myref.child("relay").setValue("1")//open
+              Toast.makeText(this, "Curtain is Open", Toast.LENGTH_SHORT).show()
+          }else if (manual_switch.isChecked == false){
+              myref.child("relay").setValue("0")//open
+              Toast.makeText(this, "Curtain is Close", Toast.LENGTH_SHORT).show()
+          }
+      }
     }
 
 
@@ -84,7 +109,57 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val checkLight:Runnable = object: Runnable{
+    fun btn1_timefrom(){
+
+        val dialog = CmtpDialogFragment.newInstance()
+        dialog.setInitialTime24(12,0 )
+        dialog.setOnTime24PickedListener {
+            buttonStart.setText(it.toString())
+        }
+        dialog.show(supportFragmentManager, "TimePicker")
+    }
+
+    fun btn2_timefrom(){
+
+        val dialog = CmtpDialogFragment.newInstance()
+        dialog.setInitialTime24(12,0 )
+        dialog.setOnTime24PickedListener {
+            buttonEnd.setText(it.toString())
+        }
+        dialog.show(supportFragmentManager, "TimePicker")
+    }
+
+    private fun checkTime(){
+        val sdf = SimpleDateFormat("yyyyMMdd")
+        val frmt = DecimalFormat("00")
+        val date = sdf.format(Date())
+        val ddbdate = "PI_03_" + date
+        val hour = SimpleDateFormat("HH").format(Date())
+        val min = SimpleDateFormat("mm").format(Date())
+        val sec = SimpleDateFormat("ss").format(Date())
+        val minSec = min + frmt.format((floor(sec.toDouble()/10)*10).toInt())
+
+        val time = SimpleDateFormat("HH:mm").format(Date())
+        val ref = FirebaseDatabase.getInstance().getReference().child(ddbdate)
+        val lastQuery = ref.child(hour).child(minSec)
+        lastQuery.addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(p0: DataSnapshot) {
+                val startTime = buttonStart.text.toString()
+                val endTime = buttonEnd.text.toString()
+
+                if(time >= startTime && time <=endTime){
+                    myref.child("relay").setValue("0")//close
+                }else{
+                    myref.child("relay").setValue("1")//open
+                }
+            }
+            override fun onCancelled(p0: DatabaseError) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+        })
+    }
+
+   /* private val checkLight:Runnable = object: Runnable{
         override fun run() {
                 val sdf = SimpleDateFormat("yyyyMMdd")
                 val frmt = DecimalFormat("00")
@@ -120,7 +195,8 @@ class MainActivity : AppCompatActivity() {
 
             handlers.postDelayed(this, 100)
         }
-    }
+    } */
+
 
     private val ToastRunnabler: Runnable = object : Runnable {
         override fun run() {
